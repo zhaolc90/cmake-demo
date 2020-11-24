@@ -1,42 +1,101 @@
-// Example program:
-// Using SDL2 to create an application window
-
 #include "SDL.h"
 #include <stdio.h>
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+
+bool init();
+bool loadMedia();
+void close();
+
+SDL_Window* gWindow = NULL;                    // Declare a pointer
+SDL_Surface* gScreenSurface = NULL;
+SDL_Surface* gHelloWorld = NULL;
 
 int main(int argc, char* argv[]) {
-
-    SDL_Window* window;                    // Declare a pointer
-
-    // 07-14-2018: Modified by ZDH
-    // SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
-    SDL_Init(SDL_INIT_EVERYTHING);              // Initialize SDL2
-                                           // Create an application window with the following settings:
-    window = SDL_CreateWindow(
-        "An SDL2 window",                  // window title
-        SDL_WINDOWPOS_UNDEFINED,           // initial x position
-        SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        640,                               // width, in pixels
-        480,                               // height, in pixels
-        SDL_WINDOW_OPENGL                  // flags - see below
-    );
-
-    // Check that the window was successfully created
-    if (window == NULL) {
-        // In the case that the window could not be made...
-        printf("Could not create window: %s\n", SDL_GetError());
-        return 1;
+    if(!init())
+    {
+        printf("Failed to initialize!\n");
     }
+    else
+    {
+        if(!loadMedia())
+        {
+            printf("Failed to load media!\n");
+        }
+        else
+        {
+            SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+            SDL_UpdateWindowSurface(gWindow);
 
-    // The window is open: could enter program loop here (see SDL_PollEvent())
+            SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+        }
+        
+    }
     
-    printf("hello window: %i\n", 10);
-    SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+    // getchar();
+    close();
+    return 0;
+}
 
-    // Close and destroy the window
-    SDL_DestroyWindow(window);
+bool init()
+{
+    bool success = true;
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("SDL could not initialize! SDL_Error:%s\n", SDL_GetError());
+         success = false;
+    }
+    else
+    {
+        gWindow = SDL_CreateWindow(
+            "SDL Toturial",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            SDL_WINDOW_SHOWN
+        );
+        
+        if(gWindow == NULL)
+        {
+            printf("Window coundnot be created! SDL_Error:%s\n", SDL_GetError());
+             success = false;
+        }
+        else{
+            gScreenSurface = SDL_GetWindowSurface(gWindow);
+                
+            SDL_FillRect(gScreenSurface, NULL, SDL_MapRGB(gScreenSurface->format,
+                0xCC, 0xCC, 0xCC));
+            SDL_UpdateWindowSurface(gWindow);
+
+            // SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+            
+        }
+    }
+    return success;
+}
+
+bool loadMedia()
+{
+    bool success = true;
+    gHelloWorld = SDL_LoadBMP("./hello_world.bmp");
+    if(gHelloWorld == NULL)
+    {
+        printf("SDL could not load image! SDL_Error:%s\n", SDL_GetError());
+        success = false;
+    }
+    return success;
+}
+
+void close()
+{
+    SDL_FreeSurface(gHelloWorld);
+    gHelloWorld = NULL;
+
+    SDL_DestroyWindow(gWindow);
+    gWindow = NULL;
 
     // Clean up
     SDL_Quit();
-    return 0;
 }

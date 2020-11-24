@@ -14,6 +14,7 @@ endif ()
 # find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
+# add_executable(SDL2Test WIN32 Main.cpp)
 add_executable(SDL2Test Main.cpp)
 target_link_libraries(SDL2Test ${SDL2_LIBRARIES})
 
@@ -21,3 +22,5 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/SDL2-2.0.12/include
 )
+
+# file(COPY hello_world.bmp DESTINATION ${BINARY_DIR}/)
